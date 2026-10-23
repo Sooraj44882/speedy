@@ -1,9 +1,16 @@
-
+import { useEffect } from "react";
+import runDijkstra from "./Dijkstra";
 
 const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+  useEffect(() => {
+    runDijkstra();
+  }, []);
 
-export default App
+  return (
+    <div>
+      <h1>App</h1>
+    </div>
+  );
+};
+
+export default App;
