@@ -16,3 +16,11 @@
   height: 30px;
   border: 1px solid #c3c3c3;
 }
+
+.node-start {
+  background-color: #2ecc71; 
+}
+
+.node-end {
+  background-color: #e74c3c; 
+}
