@@ -17,6 +17,10 @@ const getInitialGrid = () => {
         col: c,
         isStart: r === START_NODE_ROW && c === START_NODE_COL,
         isEnd: r === END_NODE_ROW && c === END_NODE_COL,
+        distance: Infinity,
+        isVisited: false,
+        isWall: false,
+        previousNode: null,
       });
     }
     tempGrid.push(currentRow);
@@ -24,8 +28,36 @@ const getInitialGrid = () => {
   return tempGrid;
 };
 
+const getNewGridWithWallToggled = (grid, row, col) => {
+  const newGrid = grid.slice();
+  const node = newGrid[row][col];
+  const newNode = {
+    ...node,
+    isWall: !node.isWall,
+  };
+  newGrid[row][col] = newNode;
+  return newGrid;
+};
+
 function Visualizer() {
-  const [grid] = useState(getInitialGrid());
+  const [grid, setGrid] = useState(getInitialGrid());
+  const [mouseIsPressed, setMouseIsPressed] = useState(false);
+
+  const handleMouseDown = (row, col) => {
+    const newGrid = getNewGridWithWallToggled(grid, row, col);
+    setGrid(newGrid);
+    setMouseIsPressed(true);
+  };
+
+  const handleMouseEnter = (row, col) => {
+    if (!mouseIsPressed) return;
+    const newGrid = getNewGridWithWallToggled(grid, row, col);
+    setGrid(newGrid);
+  };
+
+  const handleMouseUp = () => {
+    setMouseIsPressed(false);
+  };
 
 const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
@@ -38,7 +70,8 @@ const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
         if (!node.isStart && !node.isEnd) {
-          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node node-visited";
         }
       }, 20 * i);
     }
@@ -49,7 +82,8 @@ const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
       setTimeout(() => {
         const node = shortestPath[i];
         if (!node.isStart && !node.isEnd) {
-          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-path';
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node node-path";
         }
       }, 50 * i);
     }
@@ -76,23 +110,29 @@ const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
         Start Delivery
       </button>
 
-      {grid.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
-          {row.map((node, colIndex) => {
-            let extraClass = "";
-            if (node.isStart) extraClass = "node-start";
-            if (node.isEnd) extraClass = "node-end";
+      <div onMouseLeave={() => setMouseIsPressed(false)}>
+        {grid.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((node, colIndex) => {
+              let extraClass = "";
+              if (node.isStart) extraClass = "node-start";
+              else if (node.isEnd) extraClass = "node-end";
+              else if (node.isWall) extraClass = "node-wall";
 
-            return (
-              <div
-                key={colIndex}
-                id={`node-${node.row}-${node.col}`}
-                className={`node ${extraClass}`}
-              ></div>
-            );
-          })}
-        </div>
-      ))}
+              return (
+                <div
+                  key={colIndex}
+                  id={`node-${node.row}-${node.col}`}
+                  className={`node ${extraClass}`}
+                  onMouseDown={() => handleMouseDown(node.row, node.col)}
+                  onMouseEnter={() => handleMouseEnter(node.row, node.col)}
+                  onMouseUp={() => handleMouseUp()}
+                ></div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

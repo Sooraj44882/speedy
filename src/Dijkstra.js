@@ -22,7 +22,7 @@ export function runDijkstra(grid, startNode, endNode) {
     if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
 
     for (const neighbor of neighbors) {
-      if (!neighbor.isVisited) {
+      if (!neighbor.isVisited && !neighbor.isWall) {
         neighbor.previousNode = currentNode;
         queue.push(neighbor);
       }
