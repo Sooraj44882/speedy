@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { runDijkstra } from "./Dijkstra.js";
+import { runDijkstra, getShortestPath } from './Dijkstra.js';
 import "./App.css";
 
 const START_NODE_ROW = 1;
@@ -27,28 +27,42 @@ const getInitialGrid = () => {
 function Visualizer() {
   const [grid] = useState(getInitialGrid());
 
-  const animateAlgorithm = (visitedNodesInOrder) => {
+const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          animateShortestPath(shortestPath);
+        }, 20 * i);
         return;
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
         if (!node.isStart && !node.isEnd) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-visited";
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
         }
       }, 20 * i);
+    }
+  };
+
+  const animateShortestPath = (shortestPath) => {
+    for (let i = 0; i < shortestPath.length; i++) {
+      setTimeout(() => {
+        const node = shortestPath[i];
+        if (!node.isStart && !node.isEnd) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-path';
+        }
+      }, 50 * i);
     }
   };
 
   const startSearch = () => {
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const endNode = grid[END_NODE_ROW][END_NODE_COL];
-
+    
     const visitedNodesInOrder = runDijkstra(grid, startNode, endNode);
-
-    animateAlgorithm(visitedNodesInOrder);
+    const shortestPath = getShortestPath(endNode);
+    
+    animateAlgorithm(visitedNodesInOrder, shortestPath);
   };
 
   return (
@@ -56,7 +70,8 @@ function Visualizer() {
       <h2>Speedy Delivery Map</h2>
       <button
         onClick={startSearch}
-        style={{ marginBottom: "20px", padding: "10px" }}
+        style={{ marginBottom: "20px", padding: "10px",border:"2px solid black ",borderRadius: "5px" }
+      }
       >
         Start Delivery
       </button>

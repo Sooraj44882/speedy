@@ -31,6 +31,17 @@ export function runDijkstra(grid, startNode, endNode) {
   return visitedNodesInOrder;
 }
 
+export function getShortestPath(endNode) {
+  const shortestPath = [];
+  let currentNode = endNode;
+  
+  while (currentNode) {
+    shortestPath.unshift(currentNode);
+    currentNode = currentNode.previousNode;
+  }
+  return shortestPath;
+}
+
 
 
 

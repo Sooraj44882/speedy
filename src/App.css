@@ -28,3 +28,7 @@
 .node-visited {
   background-color: rgba(0, 190, 255, 0.5); 
 }
+
+.node-path {
+  background-color: yellow; 
+} 
