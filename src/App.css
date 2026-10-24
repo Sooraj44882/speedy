@@ -24,3 +24,7 @@
 .node-end {
   background-color: #e74c3c; 
 }
+
+.node-visited {
+  background-color: rgba(0, 190, 255, 0.5); 
+}

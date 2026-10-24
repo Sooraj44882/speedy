@@ -1,81 +1,39 @@
-function runDijkstra() {
-  const rows = 5;
-  const cols = 5;
+export function runDijkstra(grid, startNode, endNode) {
+  const visitedNodesInOrder = [];
+  const queue = [];
+  
+  startNode.distance = 0;
+  queue.push(startNode);
 
-  const startId = "0,0";
-  const endId = "4,4";
+  while (queue.length > 0) {
+    const currentNode = queue.shift();
+    if (currentNode.isVisited) continue;
+    
+    currentNode.isVisited = true;
+    visitedNodesInOrder.push(currentNode);
 
-  const distances = {};
-  const previous = {};
-  const unvisited = new Set();
+    if (currentNode === endNode) return visitedNodesInOrder;
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      let id = `${r},${c}`;
-      distances[id] = Infinity;
-      previous[id] = null;
-      unvisited.add(id); 
-    }
-  }
+    const { row, col } = currentNode;
+    const neighbors = [];
+    if (row > 0) neighbors.push(grid[row - 1][col]);
+    if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+    if (col > 0) neighbors.push(grid[row][col - 1]);
+    if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
 
-  distances[startId] = 0;
-
-  function getClosestSquare() {
-    let minDistance = Infinity;
-    let closestId = null;
-    for (let id of unvisited) {
-      if (distances[id] < minDistance) {
-        minDistance = distances[id];
-        closestId = id;
+    for (const neighbor of neighbors) {
+      if (!neighbor.isVisited) {
+        neighbor.previousNode = currentNode;
+        queue.push(neighbor);
       }
     }
-    return closestId;
   }
-
-  let currentId = getClosestSquare();
-
-  while (currentId !== null) {
-    let [r, c] = currentId.split(",").map(Number); 
-
-    if (currentId === endId) {
-      break; 
-    }
-
-    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    
-    for (let dir of directions) {
-      let newRow = r + dir[0];
-      let newCol = c + dir[1];
-      let neighborId = `${newRow},${newCol}`;
-
-      if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && unvisited.has(neighborId)) {
-        
-        let totalDistance = distances[currentId] + 1; 
-
-        if (totalDistance < distances[neighborId]) {
-          distances[neighborId] = totalDistance;
-          previous[neighborId] = currentId; 
-        }
-      }
-    }
-
-    unvisited.delete(currentId);
-    
-    currentId = getClosestSquare();
-  }
-
-  let path = [];
-  let step = endId;
-  while (step !== null) {
-    path.unshift(step); 
-    step = previous[step];
-  }
-
-  console.log("Path found");
-  console.log(path.join(" -> "));
+  return visitedNodesInOrder;
 }
 
-export default runDijkstra
+
+
+
 
 /*
 trying to find way i can apply it 
@@ -125,37 +83,4 @@ function runDijkstra() {
     console.log(
       `Currently visiting City ${currentNode} (Time from start: ${distanceToCurrent})`,
     );
-
-    for (let neighbor in neighbors) {
-      let travelTime = neighbors[neighbor];
-      let totalTime = distanceToCurrent + travelTime;
-
-      if (totalTime < distances[neighbor]) {
-        console.log(
-          `  Found a faster route to ${neighbor}! Updating notebook from ${distances[neighbor]} to ${totalTime}.`,
-        );
-        distances[neighbor] = totalTime;
-        previous[neighbor] = currentNode; 
-      }
-    }
-
-    visited.add(currentNode);
-
-    currentNode = getClosestUnvisitedNode();
-  }
-
-  let path = [];
-  let step = "D"; 
-
-  while (step !== null) {
-    path.unshift(step);
-    step = previous[step];
-  }
-
-  console.log("\nALGO FINISHED");
-  console.log(`Fastest Time to D: ${distances.D} minutes`);
-  console.log(`Shortest Path: ${path.join(" -> ")}`);
-}
-
-
-export default */
+    */
