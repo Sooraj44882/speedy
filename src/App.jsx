@@ -1,9 +1,10 @@
+import Navbar from "./Components/Navbar";
 import Visualizer from "./Visualizer";
 
 const App = () => {
   return (
     <div>
-      <h1 className="text-center">Speedy</h1>
+      <Navbar/>
       <Visualizer/>
     </div>
   );
