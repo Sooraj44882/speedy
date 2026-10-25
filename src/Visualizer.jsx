@@ -99,67 +99,90 @@ function Visualizer() {
     animateAlgorithm(visitedNodesInOrder, shortestPath);
   };
 
- const clearGrid = () => {
+  const clearGrid = () => {
     setGrid(getInitialGrid());
 
     for (let r = 0; r < 10; r++) {
       for (let c = 0; c < 10; c++) {
         const node = document.getElementById(`node-${r}-${c}`);
         if (r === START_NODE_ROW && c === START_NODE_COL) {
-          node.className = 'node node-start';
+          node.className = "node node-start";
         } else if (r === END_NODE_ROW && c === END_NODE_COL) {
-          node.className = 'node node-end';
+          node.className = "node node-end";
         } else {
-          node.className = 'node';
+          node.className = "node";
         }
       }
     }
   };
   return (
-    <div className="grid">
-      <h2>Speedy Delivery Map</h2>
-      <button
-        onClick={startSearch}
-        style={{
-          marginBottom: "20px",
-          padding: "10px",
-          border: "2px solid black ",
-          borderRadius: "5px",
-        }}
-      >
-        Start Delivery
-      </button>
-      <button 
-      onClick={clearGrid} 
-      style={{ padding: "10px",
-        border: "2px solid black ",
-        borderRadius: "5px",
-       }}>
-        Clear Grid
-      </button>
+    <div className="flex flex-col items-center mt-8 mb-20 font-sans">
+      <h2 className="text-2xl font-bold text-black mb-4">
+        Speedy Delivery Map
+      </h2>
 
-      <div onMouseLeave={() => setMouseIsPressed(false)}>
-        {grid.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((node, colIndex) => {
-              let extraClass = "";
-              if (node.isStart) extraClass = "node-start";
-              else if (node.isEnd) extraClass = "node-end";
-              else if (node.isWall) extraClass = "node-wall";
+      <div className="mb-4">
+        <button
+          onClick={startSearch}
+          className="bg-black text-white px-4 py-2 mr-3 font-semibold border border-black hover:bg-gray-800"
+        >
+          Start Delivery
+        </button>
+        <button
+          onClick={clearGrid}
+          className="bg-white text-black px-4 py-2 font-semibold border border-black hover:bg-gray-100"
+        >
+          Clear Grid
+        </button>
+      </div>
 
-              return (
-                <div
-                  key={colIndex}
-                  id={`node-${node.row}-${node.col}`}
-                  className={`node ${extraClass}`}
-                  onMouseDown={() => handleMouseDown(node.row, node.col)}
-                  onMouseEnter={() => handleMouseEnter(node.row, node.col)}
-                  onMouseUp={() => handleMouseUp()}
-                ></div>
-              );
-            })}
-          </div>
-        ))}
+      <div className="flex flex-wrap justify-center gap-4 mb-6 text-sm">
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-[#2ecc71] border border-gray-400"></div>{" "}
+          Pickup
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-[#e74c3c] border border-gray-400"></div>{" "}
+          Dropoff
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-[rgb(12,53,71)] border border-gray-400"></div>{" "}
+          Wall
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-[rgba(0,190,255,0.5)] border border-gray-400"></div>{" "}
+          Searching
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-yellow-400 border border-gray-400"></div>{" "}
+          Route
+        </div>
+      </div>
+
+      <div className="grid">
+        <div onMouseLeave={() => setMouseIsPressed(false)}>
+          {grid.map((row, rowIndex) => (
+            <div key={rowIndex} className="row">
+              {row.map((node, colIndex) => {
+                let extraClass = "";
+                if (node.isStart) extraClass = "node-start";
+                else if (node.isEnd) extraClass = "node-end";
+                else if (node.isWall) extraClass = "node-wall";
+
+                return (
+                  <div
+                    key={colIndex}
+                    id={`node-${node.row}-${node.col}`}
+                    className={`node ${extraClass}`}
+                    onMouseDown={() => handleMouseDown(node.row, node.col)}
+                    onMouseEnter={() => handleMouseEnter(node.row, node.col)}
+                    onMouseUp={() => handleMouseUp()}
+                  ></div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
