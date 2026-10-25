@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./Components/Navbar";
 import Visualizer from "./Visualizer";
+import About from "./pages/About";
 
 const App = () => {
   return (
@@ -11,14 +12,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/map" element={<Visualizer />} />
-          <Route
-            path="/about"
-            element={
-              <div className="p-20 text-center text-2xl font-bold">
-              
-              </div>
-            }
-          />
+          <Route path="/about" element={<About />} />
         </Routes>
       </div>
     </Router>
