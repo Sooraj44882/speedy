@@ -1,23 +1,36 @@
+import { Link } from "react-router-dom";
+
 const Navbar = () => {
   return (
     <nav className="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-200 font-sans">
-      
       <div className="flex items-center ">
-        <h1 className="text-2xl font-bold tracking-tight text-black m-0">
+        <Link
+          to="/"
+          className="text-2xl font-bold tracking-tight text-black m-0 no-underline"
+        >
           Speedy
-        </h1>
+        </Link>
       </div>
 
       <div className="hidden md:flex gap-8">
-        <a href="#home" className="text-black font-medium text-sm hover:opacity-60 transition-opacity">
+        <Link
+          to="/"
+          className="text-black font-medium text-sm hover:opacity-60 transition-opacity"
+        >
           Home
-        </a>
-        <a href="#deliver" className="text-black font-medium text-sm hover:opacity-60 transition-opacity">
-          Send a Package
-        </a>
-        <a href="#track" className="text-black font-medium text-sm hover:opacity-60 transition-opacity">
-          Track
-        </a>
+        </Link>
+        <Link
+          to="/map"
+          className="text-black font-medium text-sm hover:opacity-60 transition-opacity"
+        >
+          Delivery Map
+        </Link>
+        <Link
+          to="/about"
+          className="text-black font-medium text-sm hover:opacity-60 transition-opacity"
+        >
+          About Us
+        </Link>
       </div>
 
       <div className="flex gap-3">
@@ -28,7 +41,6 @@ const Navbar = () => {
           Sign up
         </button>
       </div>
-
     </nav>
   );
 };
