@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { runDijkstra, getShortestPath } from './Dijkstra.js';
+import { runDijkstra, getShortestPath } from "./Dijkstra.js";
 import "./App.css";
 
 const START_NODE_ROW = 1;
@@ -59,7 +59,7 @@ function Visualizer() {
     setMouseIsPressed(false);
   };
 
-const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
+  const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
@@ -92,22 +92,50 @@ const animateAlgorithm = (visitedNodesInOrder, shortestPath) => {
   const startSearch = () => {
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const endNode = grid[END_NODE_ROW][END_NODE_COL];
-    
+
     const visitedNodesInOrder = runDijkstra(grid, startNode, endNode);
     const shortestPath = getShortestPath(endNode);
-    
+
     animateAlgorithm(visitedNodesInOrder, shortestPath);
   };
 
+ const clearGrid = () => {
+    setGrid(getInitialGrid());
+
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        const node = document.getElementById(`node-${r}-${c}`);
+        if (r === START_NODE_ROW && c === START_NODE_COL) {
+          node.className = 'node node-start';
+        } else if (r === END_NODE_ROW && c === END_NODE_COL) {
+          node.className = 'node node-end';
+        } else {
+          node.className = 'node';
+        }
+      }
+    }
+  };
   return (
     <div className="grid">
       <h2>Speedy Delivery Map</h2>
       <button
         onClick={startSearch}
-        style={{ marginBottom: "20px", padding: "10px",border:"2px solid black ",borderRadius: "5px" }
-      }
+        style={{
+          marginBottom: "20px",
+          padding: "10px",
+          border: "2px solid black ",
+          borderRadius: "5px",
+        }}
       >
         Start Delivery
+      </button>
+      <button 
+      onClick={clearGrid} 
+      style={{ padding: "10px",
+        border: "2px solid black ",
+        borderRadius: "5px",
+       }}>
+        Clear Grid
       </button>
 
       <div onMouseLeave={() => setMouseIsPressed(false)}>
