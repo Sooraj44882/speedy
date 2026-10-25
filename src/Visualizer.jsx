@@ -7,7 +7,7 @@ const START_NODE_COL = 1;
 const END_NODE_ROW = 8;
 const END_NODE_COL = 8;
 
-const getInitialGrid = () => {
+const getInitialGrid = (startRow, startCol, endRow, endCol) => {
   const tempGrid = [];
   for (let r = 0; r < 10; r++) {
     const currentRow = [];
@@ -15,8 +15,8 @@ const getInitialGrid = () => {
       currentRow.push({
         row: r,
         col: c,
-        isStart: r === START_NODE_ROW && c === START_NODE_COL,
-        isEnd: r === END_NODE_ROW && c === END_NODE_COL,
+        isStart: r === startRow && c === startCol,
+        isEnd: r === endRow && c === endCol,
         distance: Infinity,
         isVisited: false,
         isWall: false,
@@ -40,17 +40,58 @@ const getNewGridWithWallToggled = (grid, row, col) => {
 };
 
 function Visualizer() {
-  const [grid, setGrid] = useState(getInitialGrid());
-  const [mouseIsPressed, setMouseIsPressed] = useState(false);
+  const [startNodePos, setStartNodePos] = useState({
+    row: START_NODE_ROW,
+    col: START_NODE_COL,
+  });
+  const [endNodePos, setEndNodePos] = useState({
+    row: END_NODE_ROW,
+    col: END_NODE_COL,
+  });
+  const [grid, setGrid] = useState(
+    getInitialGrid(START_NODE_ROW, START_NODE_COL, END_NODE_ROW, END_NODE_COL),
+  );
 
+  const [mouseIsPressed, setMouseIsPressed] = useState(false);
+  const [drawMode, setDrawMode] = useState("WALL");
   const handleMouseDown = (row, col) => {
-    const newGrid = getNewGridWithWallToggled(grid, row, col);
-    setGrid(newGrid);
-    setMouseIsPressed(true);
+    if (drawMode === "START") {
+      if (row === endNodePos.row && col === endNodePos.col) return; // Prevent overwriting dropoff
+
+      const newGrid = grid.slice();
+      newGrid[startNodePos.row][startNodePos.col] = {
+        ...newGrid[startNodePos.row][startNodePos.col],
+        isStart: false,
+      };
+      newGrid[row][col] = {
+        ...newGrid[row][col],
+        isStart: true,
+        isWall: false,
+      };
+
+      setStartNodePos({ row, col });
+      setGrid(newGrid);
+    } else if (drawMode === "END") {
+      if (row === startNodePos.row && col === startNodePos.col) return; // Prevent overwriting pickup
+
+      const newGrid = grid.slice();
+      newGrid[endNodePos.row][endNodePos.col] = {
+        ...newGrid[endNodePos.row][endNodePos.col],
+        isEnd: false,
+      };
+      newGrid[row][col] = { ...newGrid[row][col], isEnd: true, isWall: false };
+
+      setEndNodePos({ row, col });
+      setGrid(newGrid);
+    } else {
+      const newGrid = getNewGridWithWallToggled(grid, row, col);
+      setGrid(newGrid);
+      setMouseIsPressed(true);
+    }
   };
 
   const handleMouseEnter = (row, col) => {
-    if (!mouseIsPressed) return;
+    if (!mouseIsPressed || drawMode !== "WALL") return;
     const newGrid = getNewGridWithWallToggled(grid, row, col);
     setGrid(newGrid);
   };
@@ -90,8 +131,8 @@ function Visualizer() {
   };
 
   const startSearch = () => {
-    const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    const endNode = grid[END_NODE_ROW][END_NODE_COL];
+    const startNode = grid[startNodePos.row][startNodePos.col];
+    const endNode = grid[endNodePos.row][endNodePos.col];
 
     const visitedNodesInOrder = runDijkstra(grid, startNode, endNode);
     const shortestPath = getShortestPath(endNode);
@@ -100,14 +141,21 @@ function Visualizer() {
   };
 
   const clearGrid = () => {
-    setGrid(getInitialGrid());
+    setGrid(
+      getInitialGrid(
+        startNodePos.row,
+        startNodePos.col,
+        endNodePos.row,
+        endNodePos.col,
+      ),
+    );
 
     for (let r = 0; r < 10; r++) {
       for (let c = 0; c < 10; c++) {
         const node = document.getElementById(`node-${r}-${c}`);
-        if (r === START_NODE_ROW && c === START_NODE_COL) {
+        if (r === startNodePos.row && c === startNodePos.col) {
           node.className = "node node-start";
-        } else if (r === END_NODE_ROW && c === END_NODE_COL) {
+        } else if (r === endNodePos.row && c === endNodePos.col) {
           node.className = "node node-end";
         } else {
           node.className = "node";
@@ -115,6 +163,7 @@ function Visualizer() {
       }
     }
   };
+
   return (
     <div className="flex flex-col items-center mt-8 mb-20 font-sans">
       <h2 className="text-2xl font-bold text-black mb-4">
@@ -136,6 +185,28 @@ function Visualizer() {
         </button>
       </div>
 
+      <div className="flex gap-2 mb-6 text-sm items-center">
+        <span className="font-bold mr-2">Click Action:</span>
+        <button
+          onClick={() => setDrawMode("WALL")}
+          className={`px-3 py-1 border border-black ${drawMode === "WALL" ? "bg-black text-white" : "bg-white text-black"}`}
+        >
+          Draw Traffic
+        </button>
+        <button
+          onClick={() => setDrawMode("START")}
+          className={`px-3 py-1 border border-black ${drawMode === "START" ? "bg-black text-white" : "bg-white text-black"}`}
+        >
+          Move Pickup
+        </button>
+        <button
+          onClick={() => setDrawMode("END")}
+          className={`px-3 py-1 border border-black ${drawMode === "END" ? "bg-black text-white" : "bg-white text-black"}`}
+        >
+          Move Dropoff
+        </button>
+      </div>
+
       <div className="flex flex-wrap justify-center gap-4 mb-6 text-sm">
         <div className="flex items-center gap-1">
           <div className="w-4 h-4 bg-[#2ecc71] border border-gray-400"></div>{" "}
@@ -147,7 +218,7 @@ function Visualizer() {
         </div>
         <div className="flex items-center gap-1">
           <div className="w-4 h-4 bg-[rgb(12,53,71)] border border-gray-400"></div>{" "}
-          Wall
+          Traffic (Wall)
         </div>
         <div className="flex items-center gap-1">
           <div className="w-4 h-4 bg-[rgba(0,190,255,0.5)] border border-gray-400"></div>{" "}
